@@ -2,8 +2,7 @@ package com.example.financetracker.auth.api.error;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
-import java.time.Instant;
-import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -11,7 +10,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import java.time.Instant;
+import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -20,6 +22,7 @@ public class GlobalExceptionHandler {
             DuplicateEmailException exception,
             HttpServletRequest request
     ) {
+        log.warn("Duplicate email registration attempt: {}", exception.getMessage());
         return buildResponse(HttpStatus.CONFLICT, exception.getMessage(), request);
     }
 
@@ -28,6 +31,7 @@ public class GlobalExceptionHandler {
             InvalidCredentialsException exception,
             HttpServletRequest request
     ) {
+        log.info("Invalid credentials attempt for request: {}", request.getRequestURI());
         return buildResponse(HttpStatus.UNAUTHORIZED, exception.getMessage(), request);
     }
 
@@ -36,6 +40,7 @@ public class GlobalExceptionHandler {
             UserNotFoundException exception,
             HttpServletRequest request
     ) {
+        log.debug("User not found: {}", exception.getMessage());
         return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage(), request);
     }
 
@@ -49,6 +54,7 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(this::formatFieldError)
                 .collect(Collectors.joining(", "));
+        log.warn("Validation failed for {}: {}", request.getRequestURI(), message);
         return buildResponse(HttpStatus.BAD_REQUEST, message, request);
     }
 
@@ -57,6 +63,7 @@ public class GlobalExceptionHandler {
             ConstraintViolationException exception,
             HttpServletRequest request
     ) {
+        log.warn("Constraint violation: {}", exception.getMessage());
         return buildResponse(HttpStatus.BAD_REQUEST, exception.getMessage(), request);
     }
 
@@ -65,6 +72,7 @@ public class GlobalExceptionHandler {
             AccessDeniedException exception,
             HttpServletRequest request
     ) {
+        log.warn("Access denied for {} {}", request.getMethod(), request.getRequestURI());
         return buildResponse(HttpStatus.FORBIDDEN, "Access denied", request);
     }
 
@@ -73,6 +81,8 @@ public class GlobalExceptionHandler {
             Exception exception,
             HttpServletRequest request
     ) {
+        log.error("Unexpected error occurred while processing {} {}: {}",
+                request.getMethod(), request.getRequestURI(), exception.getMessage(), exception);
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error", request);
     }
 
