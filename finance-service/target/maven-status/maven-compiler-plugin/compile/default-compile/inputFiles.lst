@@ -28,6 +28,7 @@
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/security/JwtAuthenticationFilter.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/security/JwtProperties.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/security/JwtService.java
+/Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/security/RestAccessDeniedHandler.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/security/RestAuthenticationEntryPoint.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/security/SecurityConfig.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/service/CategoryService.java

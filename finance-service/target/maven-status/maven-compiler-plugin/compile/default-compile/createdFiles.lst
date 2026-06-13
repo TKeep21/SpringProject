@@ -8,6 +8,7 @@ com/example/financetracker/finance/security/JwtProperties.class
 com/example/financetracker/finance/api/dto/MemberResponse.class
 com/example/financetracker/finance/api/error/GlobalExceptionHandler.class
 com/example/financetracker/finance/api/error/ApiErrorResponse.class
+com/example/financetracker/finance/security/RestAccessDeniedHandler.class
 com/example/financetracker/finance/api/error/CategoryNotFoundException.class
 com/example/financetracker/finance/security/AuthenticatedUser.class
 com/example/financetracker/finance/group/FamilyMemberRepository.class

@@ -14,6 +14,7 @@
 /Users/mahacmagomedov/IdeaProjects/SpringProject/auth-service/src/main/java/com/example/financetracker/auth/security/JwtAuthenticationFilter.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/auth-service/src/main/java/com/example/financetracker/auth/security/JwtProperties.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/auth-service/src/main/java/com/example/financetracker/auth/security/JwtService.java
+/Users/mahacmagomedov/IdeaProjects/SpringProject/auth-service/src/main/java/com/example/financetracker/auth/security/RestAccessDeniedHandler.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/auth-service/src/main/java/com/example/financetracker/auth/security/RestAuthenticationEntryPoint.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/auth-service/src/main/java/com/example/financetracker/auth/security/SecurityConfig.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/auth-service/src/main/java/com/example/financetracker/auth/service/AuthService.java

@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: auth_user
       POSTGRES_PASSWORD: auth_password
     ports:
-      - "5432:5432"
+      - "55432:5432"
     volumes:
       - auth-postgres-data:/var/lib/postgresql/data
 
@@ -19,7 +19,7 @@ services:
       POSTGRES_USER: finance_user
       POSTGRES_PASSWORD: finance_password
     ports:
-      - "5433:5432"
+      - "55433:5432"
     volumes:
       - finance-postgres-data:/var/lib/postgresql/data
 
