@@ -1,15 +1,19 @@
 package com.example.financetracker.finance.api.error;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.Instant;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -20,52 +24,18 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(GroupNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleGroupNotFound(
-            GroupNotFoundException exception,
-            HttpServletRequest request
-    ) {
-        return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage(), request);
+    private final ApiErrorResponseFactory responseFactory;
+
+    public GlobalExceptionHandler(ApiErrorResponseFactory responseFactory) {
+        this.responseFactory = responseFactory;
     }
 
-    @ExceptionHandler(MemberNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleMemberNotFound(
-            MemberNotFoundException exception,
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ApiErrorResponse> handleApiException(
+            ApiException exception,
             HttpServletRequest request
     ) {
-        return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage(), request);
-    }
-
-    @ExceptionHandler(MemberAlreadyExistsException.class)
-    public ResponseEntity<ApiErrorResponse> handleMemberAlreadyExists(
-            MemberAlreadyExistsException exception,
-            HttpServletRequest request
-    ) {
-        return buildResponse(HttpStatus.CONFLICT, exception.getMessage(), request);
-    }
-
-    @ExceptionHandler(CategoryAlreadyExistsException.class)
-    public ResponseEntity<ApiErrorResponse> handleCategoryAlreadyExists(
-            CategoryAlreadyExistsException exception,
-            HttpServletRequest request
-    ) {
-        return buildResponse(HttpStatus.CONFLICT, exception.getMessage(), request);
-    }
-
-    @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleCategoryNotFound(
-            CategoryNotFoundException exception,
-            HttpServletRequest request
-    ) {
-        return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage(), request);
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiErrorResponse> handleAccessDenied(
-            AccessDeniedException exception,
-            HttpServletRequest request
-    ) {
-        return buildResponse(HttpStatus.FORBIDDEN, exception.getMessage(), request);
+        return buildResponse(exception.getStatus(), exception.getMessage(), request, exception.getDetails());
     }
 
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
@@ -81,17 +51,45 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException exception,
             HttpServletRequest request
     ) {
-        String message = exception.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(this::formatFieldError)
-                .collect(Collectors.joining(", "));
         Map<String, String> details = exception.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .collect(Collectors.toMap(
                         FieldError::getField,
                         error -> error.getDefaultMessage() == null ? "Invalid value" : error.getDefaultMessage(),
+                        (first, second) -> first,
+                        LinkedHashMap::new
+                ));
+        return buildResponse(HttpStatus.BAD_REQUEST, "Validation failed", request, details);
+    }
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ApiErrorResponse> handleBindException(
+            BindException exception,
+            HttpServletRequest request
+    ) {
+        Map<String, String> details = exception.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        error -> error.getDefaultMessage() == null ? "Invalid value" : error.getDefaultMessage(),
+                        (first, second) -> first,
+                        LinkedHashMap::new
+                ));
+        return buildResponse(HttpStatus.BAD_REQUEST, "Validation failed", request, details);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleConstraintViolation(
+            ConstraintViolationException exception,
+            HttpServletRequest request
+    ) {
+        Map<String, String> details = exception.getConstraintViolations()
+                .stream()
+                .collect(Collectors.toMap(
+                        this::extractFieldName,
+                        ConstraintViolation::getMessage,
                         (first, second) -> first,
                         LinkedHashMap::new
                 ));
@@ -116,6 +114,19 @@ public class GlobalExceptionHandler {
                 "Malformed request body",
                 request,
                 Map.of("body", "Check JSON syntax, field types, and enum values")
+        );
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ApiErrorResponse> handleUnsupportedMediaType(
+            HttpMediaTypeNotSupportedException exception,
+            HttpServletRequest request
+    ) {
+        return buildResponse(
+                HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+                "Unsupported media type",
+                request,
+                Map.of("Content-Type", "Use " + MediaType.APPLICATION_JSON_VALUE)
         );
     }
 
@@ -187,18 +198,13 @@ public class GlobalExceptionHandler {
             HttpServletRequest request,
             Map<String, String> details
     ) {
-        ApiErrorResponse response = new ApiErrorResponse(
-                Instant.now(),
-                status.value(),
-                status.getReasonPhrase(),
-                message,
-                request.getRequestURI(),
-                details
-        );
+        ApiErrorResponse response = responseFactory.create(status, message, request.getRequestURI(), details);
         return ResponseEntity.status(status).body(response);
     }
 
-    private String formatFieldError(FieldError error) {
-        return "%s: %s".formatted(error.getField(), error.getDefaultMessage());
+    private String extractFieldName(ConstraintViolation<?> violation) {
+        String path = violation.getPropertyPath().toString();
+        int separatorIndex = path.lastIndexOf('.');
+        return separatorIndex >= 0 ? path.substring(separatorIndex + 1) : path;
     }
 }

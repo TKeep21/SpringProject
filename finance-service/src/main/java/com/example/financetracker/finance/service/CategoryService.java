@@ -3,6 +3,7 @@ package com.example.financetracker.finance.service;
 import com.example.financetracker.finance.api.dto.CategoryResponse;
 import com.example.financetracker.finance.api.dto.CreateCategoryRequest;
 import com.example.financetracker.finance.api.error.AccessDeniedException;
+import com.example.financetracker.finance.api.error.AuthenticatedUserNotAvailableException;
 import com.example.financetracker.finance.api.error.CategoryAlreadyExistsException;
 import com.example.financetracker.finance.api.error.GroupNotFoundException;
 import com.example.financetracker.finance.category.Category;
@@ -126,7 +127,7 @@ public class CategoryService {
         if (principal instanceof AuthenticatedUser authenticatedUser) {
             return authenticatedUser;
         }
-        throw new AccessDeniedException("Authenticated user is not available");
+        throw new AuthenticatedUserNotAvailableException();
     }
 
     private String normalizeName(String name) {

@@ -5,7 +5,9 @@ import com.example.financetracker.finance.api.dto.CreateGroupRequest;
 import com.example.financetracker.finance.api.dto.GroupResponse;
 import com.example.financetracker.finance.api.dto.MemberResponse;
 import com.example.financetracker.finance.api.error.AccessDeniedException;
+import com.example.financetracker.finance.api.error.AuthenticatedUserNotAvailableException;
 import com.example.financetracker.finance.api.error.GroupNotFoundException;
+import com.example.financetracker.finance.api.error.InvalidGroupMemberRoleException;
 import com.example.financetracker.finance.api.error.MemberAlreadyExistsException;
 import com.example.financetracker.finance.api.error.MemberNotFoundException;
 import com.example.financetracker.finance.group.FamilyGroup;
@@ -96,7 +98,7 @@ public class FamilyGroupService {
         requireManager(actorMembership);
 
         if (request.role() == FamilyRole.OWNER) {
-            throw new IllegalArgumentException("New members cannot be added with OWNER role");
+            throw new InvalidGroupMemberRoleException();
         }
         if (familyMemberRepository.existsByGroupIdAndUserId(groupId, request.userId())) {
             throw new MemberAlreadyExistsException(groupId, request.userId());
@@ -151,7 +153,7 @@ public class FamilyGroupService {
         if (principal instanceof AuthenticatedUser authenticatedUser) {
             return authenticatedUser;
         }
-        throw new AccessDeniedException("Authenticated user is not available");
+        throw new AuthenticatedUserNotAvailableException();
     }
 
     private GroupResponse toGroupResponse(FamilyGroup group, List<FamilyMember> members) {
