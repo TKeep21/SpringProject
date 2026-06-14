@@ -75,6 +75,9 @@ public class FinanceOperationsClient {
         if (request.type() != null) {
             builder.queryParam("type", request.type());
         }
+        if (request.normalizedCurrency() != null) {
+            builder.queryParam("currency", request.normalizedCurrency());
+        }
         return builder.build();
     }
 
