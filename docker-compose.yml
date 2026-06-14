@@ -60,11 +60,14 @@ services:
       FINANCE_DB_USERNAME: finance_user
       FINANCE_DB_PASSWORD: finance_password
       JWT_SECRET: ${JWT_SECRET:-change-me-change-me-change-me-change-me-1234567890}
+      AUTH_SERVICE_BASE_URL: http://auth-service:8081
     ports:
       - "8082:8082"
     depends_on:
       finance-postgres:
         condition: service_healthy
+      auth-service:
+        condition: service_started
 
   report-service:
     build:
