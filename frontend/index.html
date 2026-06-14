@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Finance Tracker Demo UI</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Finance Tracker Demo UI</h1>
+      <p>Vanilla JS client for manual backend checks.</p>
+    </div>
+    <div class="token-panel">
+      <div class="token-label">JWT</div>
+      <code id="tokenStatus">No token</code>
+      <button id="logoutButton" type="button">Logout / clear token</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="action-card" data-action="register">
+      <h2>Register</h2>
+      <form>
+        <label>Email <input name="email" type="email" value="demo@example.com" required></label>
+        <label>Password <input name="password" type="password" value="password123" required></label>
+        <label>First name <input name="firstName" value="Demo" required></label>
+        <label>Last name <input name="lastName" value="User" required></label>
+        <button type="submit">Register</button>
+      </form>
+      <div class="output-grid">
+        <div><h3>Result</h3><pre class="result"></pre></div>
+        <div><h3>Error</h3><pre class="error"></pre></div>
+      </div>
+    </section>
+
+    <section class="action-card" data-action="login">
+      <h2>Login</h2>
+      <form>
+        <label>Email <input name="email" type="email" value="demo@example.com" required></label>
+        <label>Password <input name="password" type="password" value="password123" required></label>
+        <button type="submit">Login</button>
+      </form>
+      <div class="output-grid">
+        <div><h3>Result</h3><pre class="result"></pre></div>
+        <div><h3>Error</h3><pre class="error"></pre></div>
+      </div>
+    </section>
+
+    <section class="action-card" data-action="me">
+      <h2>Get current user</h2>
+      <form>
+        <button type="submit">Get current user</button>
+      </form>
+      <div class="output-grid">
+        <div><h3>Result</h3><pre class="result"></pre></div>
+        <div><h3>Error</h3><pre class="error"></pre></div>
+      </div>
+    </section>
+
+    <section class="action-card" data-action="createGroup">
+      <h2>Create group</h2>
+      <form>
+        <label>Name <input name="name" value="Demo family" required></label>
+        <label>Description <input name="description" value="Manual test group"></label>
+        <button type="submit">Create group</button>
+      </form>
+      <div class="output-grid">
+        <div><h3>Result</h3><pre class="result"></pre></div>
+        <div><h3>Error</h3><pre class="error"></pre></div>
+      </div>
+    </section>
+
+    <section class="action-card" data-action="addMember">
+      <h2>Add member</h2>
+      <form>
+        <label>Group ID <input name="groupId" placeholder="UUID" required></label>
+        <label>User ID <input name="userId" placeholder="UUID" required></label>
+        <label>Role
+          <select name="role">
+            <option value="MEMBER">MEMBER</option>
+            <option value="ADMIN">ADMIN</option>
+            <option value="OWNER">OWNER</option>
+          </select>
+        </label>
+        <button type="submit">Add member</button>
+      </form>
+      <div class="output-grid">
+        <div><h3>Result</h3><pre class="result"></pre></div>
+        <div><h3>Error</h3><pre class="error"></pre></div>
+      </div>
+    </section>
+
+    <section class="action-card" data-action="createCategory">
+      <h2>Create category</h2>
+      <form>
+        <label>Name <input name="name" value="Groceries" required></label>
+        <label>Type
+          <select name="type">
+            <option value="EXPENSE">EXPENSE</option>
+            <option value="INCOME">INCOME</option>
+          </select>
+        </label>
+        <label>Group ID <input name="groupId" placeholder="Optional UUID"></label>
+        <button type="submit">Create category</button>
+      </form>
+      <div class="output-grid">
+        <div><h3>Result</h3><pre class="result"></pre></div>
+        <div><h3>Error</h3><pre class="error"></pre></div>
+      </div>
+    </section>
+
+    <section class="action-card" data-action="createOperation">
+      <h2>Create operation</h2>
+      <form>
+        <label>Group ID <input name="groupId" placeholder="Optional UUID"></label>
+        <label>Category ID <input name="categoryId" placeholder="UUID" required></label>
+        <label>Type
+          <select name="type">
+            <option value="EXPENSE">EXPENSE</option>
+            <option value="INCOME">INCOME</option>
+          </select>
+        </label>
+        <label>Amount <input name="amount" type="number" min="0.01" step="0.01" value="100.00" required></label>
+        <label>Currency <input name="currency" value="USD" maxlength="3" required></label>
+        <label>Operation date <input name="operationDate" type="date" required></label>
+        <label>Description <input name="description" value="Manual demo operation"></label>
+        <button type="submit">Create operation</button>
+      </form>
+      <div class="output-grid">
+        <div><h3>Result</h3><pre class="result"></pre></div>
+        <div><h3>Error</h3><pre class="error"></pre></div>
+      </div>
+    </section>
+
+    <section class="action-card" data-action="getOperations">
+      <h2>Get operations</h2>
+      <form>
+        <label>From date <input name="fromDate" type="date"></label>
+        <label>To date <input name="toDate" type="date"></label>
+        <label>Type
+          <select name="type">
+            <option value="">Any</option>
+            <option value="EXPENSE">EXPENSE</option>
+            <option value="INCOME">INCOME</option>
+          </select>
+        </label>
+        <label>Category ID <input name="categoryId" placeholder="Optional UUID"></label>
+        <label>Group ID <input name="groupId" placeholder="Optional UUID"></label>
+        <label>User ID <input name="userId" placeholder="Optional UUID"></label>
+        <label>Page <input name="page" type="number" min="0" value="0"></label>
+        <label>Size <input name="size" type="number" min="1" value="20"></label>
+        <button type="submit">Get operations</button>
+      </form>
+      <div class="output-grid">
+        <div><h3>Result</h3><pre class="result"></pre></div>
+        <div><h3>Error</h3><pre class="error"></pre></div>
+      </div>
+    </section>
+
+    <section class="action-card" data-action="summaryReport">
+      <h2>Get summary report</h2>
+      <form class="report-form">
+        <label>From <input name="from" type="date" required></label>
+        <label>To <input name="to" type="date" required></label>
+        <label>Group ID <input name="groupId" placeholder="Optional UUID"></label>
+        <label>User IDs <input name="userIds" placeholder="Optional UUIDs, comma separated"></label>
+        <label>Type
+          <select name="type">
+            <option value="">Any</option>
+            <option value="EXPENSE">EXPENSE</option>
+            <option value="INCOME">INCOME</option>
+          </select>
+        </label>
+        <label>Currency <input name="currency" value="USD" maxlength="3"></label>
+        <button type="submit">Get summary</button>
+      </form>
+      <div class="output-grid">
+        <div><h3>Result</h3><pre class="result"></pre></div>
+        <div><h3>Error</h3><pre class="error"></pre></div>
+      </div>
+    </section>
+
+    <section class="action-card" data-action="categoryReport">
+      <h2>Get by-category report</h2>
+      <form class="report-form">
+        <label>From <input name="from" type="date" required></label>
+        <label>To <input name="to" type="date" required></label>
+        <label>Group ID <input name="groupId" placeholder="Optional UUID"></label>
+        <label>User IDs <input name="userIds" placeholder="Optional UUIDs, comma separated"></label>
+        <label>Type
+          <select name="type">
+            <option value="">Any</option>
+            <option value="EXPENSE">EXPENSE</option>
+            <option value="INCOME">INCOME</option>
+          </select>
+        </label>
+        <label>Currency <input name="currency" value="USD" maxlength="3"></label>
+        <button type="submit">Get by category</button>
+      </form>
+      <div class="output-grid">
+        <div><h3>Result</h3><pre class="result"></pre></div>
+        <div><h3>Error</h3><pre class="error"></pre></div>
+      </div>
+    </section>
+
+    <section class="action-card" data-action="memberReport">
+      <h2>Get by-member report</h2>
+      <form class="report-form">
+        <label>From <input name="from" type="date" required></label>
+        <label>To <input name="to" type="date" required></label>
+        <label>Group ID <input name="groupId" placeholder="Optional UUID"></label>
+        <label>User IDs <input name="userIds" placeholder="Optional UUIDs, comma separated"></label>
+        <label>Type
+          <select name="type">
+            <option value="">Any</option>
+            <option value="EXPENSE">EXPENSE</option>
+            <option value="INCOME">INCOME</option>
+          </select>
+        </label>
+        <label>Currency <input name="currency" value="USD" maxlength="3"></label>
+        <button type="submit">Get by member</button>
+      </form>
+      <div class="output-grid">
+        <div><h3>Result</h3><pre class="result"></pre></div>
+        <div><h3>Error</h3><pre class="error"></pre></div>
+      </div>
+    </section>
+
+    <section class="action-card" data-action="exportCsv">
+      <h2>Export CSV</h2>
+      <form class="report-form">
+        <label>From <input name="from" type="date" required></label>
+        <label>To <input name="to" type="date" required></label>
+        <label>Group ID <input name="groupId" placeholder="Optional UUID"></label>
+        <label>User IDs <input name="userIds" placeholder="Optional UUIDs, comma separated"></label>
+        <label>Type
+          <select name="type">
+            <option value="">Any</option>
+            <option value="EXPENSE">EXPENSE</option>
+            <option value="INCOME">INCOME</option>
+          </select>
+        </label>
+        <label>Currency <input name="currency" value="USD" maxlength="3"></label>
+        <button type="submit">Export CSV</button>
+      </form>
+      <div class="output-grid">
+        <div><h3>Result</h3><pre class="result"></pre></div>
+        <div><h3>Error</h3><pre class="error"></pre></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
