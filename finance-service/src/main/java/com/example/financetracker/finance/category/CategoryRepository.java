@@ -1,6 +1,7 @@
 package com.example.financetracker.finance.category;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -19,6 +20,13 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
     List<Category> findAllByGroupIdAndTypeOrderByNameAsc(UUID groupId, OperationType type);
 
     boolean existsByNameIgnoreCaseAndTypeAndOwnerUserIdAndGroupId(
+            String name,
+            OperationType type,
+            UUID ownerUserId,
+            UUID groupId
+    );
+
+    Optional<Category> findByNameIgnoreCaseAndTypeAndOwnerUserIdAndGroupId(
             String name,
             OperationType type,
             UUID ownerUserId,

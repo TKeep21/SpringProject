@@ -4,6 +4,8 @@ import com.example.financetracker.finance.api.error.AccessDeniedException;
 import com.example.financetracker.finance.api.error.AuthenticatedUserNotAvailableException;
 import com.example.financetracker.finance.api.error.ExternalServiceException;
 import com.example.financetracker.finance.api.error.UserNotFoundException;
+import com.example.financetracker.finance.security.InternalServiceAuthenticator;
+import com.example.financetracker.finance.security.InternalServiceProperties;
 import java.util.UUID;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,9 +20,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class AuthUsersClient {
 
     private final RestClient restClient;
+    private final InternalServiceProperties internalServiceProperties;
 
-    public AuthUsersClient(RestClient authServiceRestClient) {
+    public AuthUsersClient(RestClient authServiceRestClient, InternalServiceProperties internalServiceProperties) {
         this.restClient = authServiceRestClient;
+        this.internalServiceProperties = internalServiceProperties;
     }
 
     public void requireUserExists(UUID userId) {
@@ -28,6 +32,7 @@ public class AuthUsersClient {
             restClient.get()
                     .uri("/internal/users/{id}", userId)
                     .header(HttpHeaders.AUTHORIZATION, currentAuthorizationHeader())
+                    .header(InternalServiceAuthenticator.HEADER_NAME, internalServiceProperties.serviceToken())
                     .retrieve()
                     .toBodilessEntity();
         } catch (ResourceAccessException exception) {

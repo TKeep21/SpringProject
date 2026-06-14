@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
 @Configuration
-@EnableConfigurationProperties(FinanceServiceProperties.class)
+@EnableConfigurationProperties({FinanceServiceProperties.class, InternalServiceProperties.class})
 public class RestClientConfig {
 
     @Bean
