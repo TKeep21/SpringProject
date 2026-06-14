@@ -1,8 +1,10 @@
 package com.example.financetracker.finance.api.error;
 
-public class CategoryNotFoundException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class CategoryNotFoundException extends ApiException {
 
     public CategoryNotFoundException(String message) {
-        super(message);
+        super(HttpStatus.NOT_FOUND, message);
     }
 }

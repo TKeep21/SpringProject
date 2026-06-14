@@ -5,6 +5,12 @@ spring:
 server:
   port: 8083
 
+finance-service:
+  base-url: http://localhost:8082
+
+jwt:
+  secret: change-me-change-me-change-me-change-me-1234567890
+
 management:
   endpoints:
     web:

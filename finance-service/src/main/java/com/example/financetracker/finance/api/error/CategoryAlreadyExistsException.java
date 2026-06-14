@@ -2,11 +2,12 @@ package com.example.financetracker.finance.api.error;
 
 import com.example.financetracker.finance.category.OperationType;
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
 
-public class CategoryAlreadyExistsException extends RuntimeException {
+public class CategoryAlreadyExistsException extends ApiException {
 
     public CategoryAlreadyExistsException(String name, OperationType type, UUID ownerUserId, UUID groupId) {
-        super(buildMessage(name, type, ownerUserId, groupId));
+        super(HttpStatus.CONFLICT, buildMessage(name, type, ownerUserId, groupId));
     }
 
     private static String buildMessage(String name, OperationType type, UUID ownerUserId, UUID groupId) {

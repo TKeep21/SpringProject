@@ -3,6 +3,7 @@ package com.example.financetracker.auth.security;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -27,7 +28,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write("""
-                {"status":401,"error":"Unauthorized","message":"Authentication is required","path":"%s"}
-                """.formatted(request.getRequestURI()).trim());
+                {"timestamp":"%s","status":401,"error":"Unauthorized","message":"Authentication is required","path":"%s","details":{}}
+                """.formatted(Instant.now(), request.getRequestURI()).trim());
     }
 }
