@@ -3,6 +3,7 @@ package com.example.financetracker.report.client;
 import com.example.financetracker.report.api.dto.ReportRequest;
 import com.example.financetracker.report.api.error.ExternalServiceException;
 import com.example.financetracker.report.api.error.InvalidReportPeriodException;
+import com.example.financetracker.report.config.InternalServiceProperties;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.http.HttpHeaders;
@@ -17,10 +18,17 @@ import org.springframework.web.util.UriBuilder;
 @Component
 public class FinanceOperationsClient {
 
-    private final RestClient restClient;
+    private static final String INTERNAL_TOKEN_HEADER = "X-Internal-Token";
 
-    public FinanceOperationsClient(RestClient financeServiceRestClient) {
+    private final RestClient restClient;
+    private final InternalServiceProperties internalServiceProperties;
+
+    public FinanceOperationsClient(
+            RestClient financeServiceRestClient,
+            InternalServiceProperties internalServiceProperties
+    ) {
         this.restClient = financeServiceRestClient;
+        this.internalServiceProperties = internalServiceProperties;
     }
 
     public List<OperationReportItem> getOperations(ReportRequest request, String authorizationHeader) {
@@ -28,6 +36,7 @@ public class FinanceOperationsClient {
             OperationReportItem[] operations = restClient.get()
                     .uri(uriBuilder -> buildOperationsUri(uriBuilder, request))
                     .header(HttpHeaders.AUTHORIZATION, authorizationHeader)
+                    .header(INTERNAL_TOKEN_HEADER, internalServiceProperties.serviceToken())
                     .retrieve()
                     .body(OperationReportItem[].class);
             if (operations == null) {
@@ -65,6 +74,9 @@ public class FinanceOperationsClient {
         }
         if (request.type() != null) {
             builder.queryParam("type", request.type());
+        }
+        if (request.normalizedCurrency() != null) {
+            builder.queryParam("currency", request.normalizedCurrency());
         }
         return builder.build();
     }

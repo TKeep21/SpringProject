@@ -18,6 +18,12 @@ server:
 jwt:
   secret: ${JWT_SECRET:change-me-change-me-change-me-change-me-1234567890}
 
+auth-service:
+  base-url: ${AUTH_SERVICE_BASE_URL:http://localhost:8081}
+
+internal:
+  service-token: ${INTERNAL_SERVICE_TOKEN:change-me-internal-service-token}
+
 management:
   endpoints:
     web:

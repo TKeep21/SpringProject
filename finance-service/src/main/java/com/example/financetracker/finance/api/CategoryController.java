@@ -2,6 +2,7 @@ package com.example.financetracker.finance.api;
 
 import com.example.financetracker.finance.api.dto.CategoryResponse;
 import com.example.financetracker.finance.api.dto.CreateCategoryRequest;
+import com.example.financetracker.finance.api.dto.UpdateCategoryRequest;
 import com.example.financetracker.finance.category.OperationType;
 import com.example.financetracker.finance.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,8 +11,11 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -43,5 +47,21 @@ public class CategoryController {
             @RequestParam(required = false) UUID groupId
     ) {
         return categoryService.getCategories(type, groupId);
+    }
+
+    @PutMapping("/{categoryId}")
+    @Operation(summary = "Update a personal or group category")
+    public CategoryResponse updateCategory(
+            @PathVariable UUID categoryId,
+            @Valid @RequestBody UpdateCategoryRequest request
+    ) {
+        return categoryService.updateCategory(categoryId, request);
+    }
+
+    @DeleteMapping("/{categoryId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete a personal or group category")
+    public void deleteCategory(@PathVariable UUID categoryId) {
+        categoryService.deleteCategory(categoryId);
     }
 }

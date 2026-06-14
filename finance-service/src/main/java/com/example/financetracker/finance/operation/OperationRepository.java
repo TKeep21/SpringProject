@@ -11,4 +11,6 @@ public interface OperationRepository extends JpaRepository<Operation, UUID>, Jpa
     Page<Operation> findAllByUserId(UUID userId, Pageable pageable);
 
     Page<Operation> findAllByGroupId(UUID groupId, Pageable pageable);
+
+    boolean existsByCategoryId(UUID categoryId);
 }

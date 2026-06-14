@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class ReportService {
     public ReportSummaryResponse getSummaryReport(ReportRequest request, String authorizationHeader) {
         validatePeriod(request);
         List<OperationReportItem> operations = financeOperationsClient.getOperations(request, authorizationHeader);
+        String currency = resolveSingleCurrency(operations, request);
         BigDecimal totalIncome = sumByType(operations, OperationType.INCOME);
         BigDecimal totalExpense = sumByType(operations, OperationType.EXPENSE);
         return new ReportSummaryResponse(
@@ -38,13 +40,15 @@ public class ReportService {
                 totalIncome,
                 totalExpense,
                 totalIncome.subtract(totalExpense),
-                resolveCurrency(operations)
+                currency
         );
     }
 
     public List<CategoryReportItemResponse> getCategoryReport(ReportRequest request, String authorizationHeader) {
         validatePeriod(request);
-        return financeOperationsClient.getOperations(request, authorizationHeader)
+        List<OperationReportItem> operations = financeOperationsClient.getOperations(request, authorizationHeader);
+        requireSingleCurrency(operations, request);
+        return operations
                 .stream()
                 .collect(Collectors.groupingBy(this::categoryKey))
                 .entrySet()
@@ -61,7 +65,9 @@ public class ReportService {
         if (request.groupId() == null) {
             throw new InvalidReportPeriodException("groupId is required for member report");
         }
-        return financeOperationsClient.getOperations(request, authorizationHeader)
+        List<OperationReportItem> operations = financeOperationsClient.getOperations(request, authorizationHeader);
+        requireSingleCurrency(operations, request);
+        return operations
                 .stream()
                 .collect(Collectors.groupingBy(OperationReportItem::userId))
                 .entrySet()
@@ -146,11 +152,22 @@ public class ReportService {
         );
     }
 
-    private String resolveCurrency(List<OperationReportItem> operations) {
-        return operations.stream()
+    private String resolveSingleCurrency(List<OperationReportItem> operations, ReportRequest request) {
+        Set<String> currencies = operations.stream()
                 .map(OperationReportItem::currency)
+                .collect(Collectors.toSet());
+        if (currencies.size() > 1) {
+            throw new InvalidReportPeriodException(
+                    "Report contains multiple currencies; pass currency parameter to build a single-currency report"
+            );
+        }
+        return currencies.stream()
                 .findFirst()
-                .orElse(DEFAULT_CURRENCY);
+                .orElse(request.normalizedCurrency() == null ? DEFAULT_CURRENCY : request.normalizedCurrency());
+    }
+
+    private void requireSingleCurrency(List<OperationReportItem> operations, ReportRequest request) {
+        resolveSingleCurrency(operations, request);
     }
 
     private String escape(String value) {

@@ -44,6 +44,7 @@ services:
       AUTH_DB_PASSWORD: auth_password
       JWT_SECRET: ${JWT_SECRET:-change-me-change-me-change-me-change-me-1234567890}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-change-me-internal-service-token}
     ports:
       - "8081:8081"
     depends_on:
@@ -60,11 +61,15 @@ services:
       FINANCE_DB_USERNAME: finance_user
       FINANCE_DB_PASSWORD: finance_password
       JWT_SECRET: ${JWT_SECRET:-change-me-change-me-change-me-change-me-1234567890}
+      AUTH_SERVICE_BASE_URL: http://auth-service:8081
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-change-me-internal-service-token}
     ports:
       - "8082:8082"
     depends_on:
       finance-postgres:
         condition: service_healthy
+      auth-service:
+        condition: service_started
 
   report-service:
     build:
@@ -74,6 +79,7 @@ services:
     environment:
       FINANCE_SERVICE_BASE_URL: http://finance-service:8082
       JWT_SECRET: ${JWT_SECRET:-change-me-change-me-change-me-change-me-1234567890}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-change-me-internal-service-token}
     ports:
       - "8083:8083"
     depends_on:

@@ -11,6 +11,9 @@ finance-service:
 jwt:
   secret: ${JWT_SECRET:change-me-change-me-change-me-change-me-1234567890}
 
+internal:
+  service-token: ${INTERNAL_SERVICE_TOKEN:change-me-internal-service-token}
+
 management:
   endpoints:
     web:

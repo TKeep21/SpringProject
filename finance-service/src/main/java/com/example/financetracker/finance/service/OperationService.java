@@ -135,6 +135,7 @@ public class OperationService {
                 .and(reportFromDate(request))
                 .and(reportToDate(request))
                 .and(reportType(request))
+                .and(reportCurrency(request))
                 .and(reportUserIds(request));
 
         List<Operation> operations = operationRepository.findAll(
@@ -254,6 +255,13 @@ public class OperationService {
             return Specification.where(null);
         }
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("type"), request.type());
+    }
+
+    private Specification<Operation> reportCurrency(InternalOperationReportRequest request) {
+        if (request.normalizedCurrency() == null) {
+            return Specification.where(null);
+        }
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("currency"), request.normalizedCurrency());
     }
 
     private Specification<Operation> reportUserIds(InternalOperationReportRequest request) {
