@@ -10,6 +10,11 @@ services:
       - "55432:5432"
     volumes:
       - auth-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   finance-postgres:
     image: postgres:16-alpine
@@ -22,6 +27,57 @@ services:
       - "55433:5432"
     volumes:
       - finance-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finance_user -d finance_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    container_name: finance-tracker-auth-service
+    environment:
+      AUTH_DB_URL: jdbc:postgresql://auth-postgres:5432/auth_db
+      AUTH_DB_USERNAME: auth_user
+      AUTH_DB_PASSWORD: auth_password
+      JWT_SECRET: ${JWT_SECRET:-change-me-change-me-change-me-change-me-1234567890}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+    ports:
+      - "8081:8081"
+    depends_on:
+      auth-postgres:
+        condition: service_healthy
+
+  finance-service:
+    build:
+      context: .
+      dockerfile: finance-service/Dockerfile
+    container_name: finance-tracker-finance-service
+    environment:
+      FINANCE_DB_URL: jdbc:postgresql://finance-postgres:5432/finance_db
+      FINANCE_DB_USERNAME: finance_user
+      FINANCE_DB_PASSWORD: finance_password
+      JWT_SECRET: ${JWT_SECRET:-change-me-change-me-change-me-change-me-1234567890}
+    ports:
+      - "8082:8082"
+    depends_on:
+      finance-postgres:
+        condition: service_healthy
+
+  report-service:
+    build:
+      context: .
+      dockerfile: report-service/Dockerfile
+    container_name: finance-tracker-report-service
+    environment:
+      FINANCE_SERVICE_BASE_URL: http://finance-service:8082
+      JWT_SECRET: ${JWT_SECRET:-change-me-change-me-change-me-change-me-1234567890}
+    ports:
+      - "8083:8083"
+    depends_on:
+      - finance-service
 
 volumes:
   auth-postgres-data:

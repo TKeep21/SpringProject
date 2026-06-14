@@ -3,13 +3,13 @@ spring:
     name: report-service
 
 server:
-  port: 8083
+  port: ${REPORT_SERVICE_PORT:8083}
 
 finance-service:
-  base-url: http://localhost:8082
+  base-url: ${FINANCE_SERVICE_BASE_URL:http://localhost:8082}
 
 jwt:
-  secret: change-me-change-me-change-me-change-me-1234567890
+  secret: ${JWT_SECRET:change-me-change-me-change-me-change-me-1234567890}
 
 management:
   endpoints:

@@ -2,9 +2,9 @@ spring:
   application:
     name: finance-service
   datasource:
-    url: jdbc:postgresql://localhost:55433/finance_db
-    username: finance_user
-    password: finance_password
+    url: ${FINANCE_DB_URL:jdbc:postgresql://localhost:55433/finance_db}
+    username: ${FINANCE_DB_USERNAME:finance_user}
+    password: ${FINANCE_DB_PASSWORD:finance_password}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -13,10 +13,10 @@ spring:
     enabled: true
 
 server:
-  port: 8082
+  port: ${FINANCE_SERVICE_PORT:8082}
 
 jwt:
-  secret: change-me-change-me-change-me-change-me-1234567890
+  secret: ${JWT_SECRET:change-me-change-me-change-me-change-me-1234567890}
 
 management:
   endpoints:
