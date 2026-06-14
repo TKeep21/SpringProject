@@ -1,6 +1,7 @@
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/FinanceServiceApplication.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/CategoryController.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/GroupController.java
+/Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/InternalOperationController.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/OperationController.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/dto/AddMemberRequest.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/dto/CategoryResponse.java
@@ -12,6 +13,8 @@
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/dto/OperationFilterRequest.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/dto/OperationResponse.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/dto/UpdateOperationRequest.java
+/Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/dto/internal/InternalOperationReportItem.java
+/Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/dto/internal/InternalOperationReportRequest.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/error/AccessDeniedException.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/error/ApiErrorResponse.java
 /Users/mahacmagomedov/IdeaProjects/SpringProject/finance-service/src/main/java/com/example/financetracker/finance/api/error/ApiErrorResponseFactory.java

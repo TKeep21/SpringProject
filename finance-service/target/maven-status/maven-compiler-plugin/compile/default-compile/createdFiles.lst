@@ -2,6 +2,7 @@ com/example/financetracker/finance/category/CategoryMapper.class
 com/example/financetracker/finance/FinanceServiceApplication.class
 com/example/financetracker/finance/api/error/MemberNotFoundException.class
 com/example/financetracker/finance/security/JwtProperties.class
+com/example/financetracker/finance/api/dto/internal/InternalOperationReportRequest.class
 com/example/financetracker/finance/api/dto/MemberResponse.class
 com/example/financetracker/finance/api/error/ApiException.class
 com/example/financetracker/finance/api/error/ApiErrorResponse.class
@@ -10,6 +11,7 @@ com/example/financetracker/finance/service/OperationService.class
 com/example/financetracker/finance/api/error/InvalidOperationCategoryException.class
 com/example/financetracker/finance/security/RestAccessDeniedHandler.class
 com/example/financetracker/finance/security/AuthenticatedUser.class
+com/example/financetracker/finance/api/dto/internal/InternalOperationReportItem.class
 com/example/financetracker/finance/group/FamilyMemberRepository.class
 com/example/financetracker/finance/security/SecurityConfig.class
 com/example/financetracker/finance/api/dto/CreateGroupRequest.class
@@ -29,6 +31,7 @@ com/example/financetracker/finance/api/error/MemberAlreadyExistsException.class
 com/example/financetracker/finance/api/dto/CategoryResponse.class
 com/example/financetracker/finance/api/CategoryController.class
 com/example/financetracker/finance/api/dto/GroupResponse.class
+com/example/financetracker/finance/api/InternalOperationController.class
 com/example/financetracker/finance/api/error/GlobalExceptionHandler.class
 com/example/financetracker/finance/api/dto/OperationResponse.class
 com/example/financetracker/finance/api/error/CategoryNotFoundException.class

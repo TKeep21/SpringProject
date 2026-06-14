@@ -1,6 +1,8 @@
 package com.example.financetracker.finance.service;
 
 import com.example.financetracker.finance.api.dto.CreateOperationRequest;
+import com.example.financetracker.finance.api.dto.internal.InternalOperationReportItem;
+import com.example.financetracker.finance.api.dto.internal.InternalOperationReportRequest;
 import com.example.financetracker.finance.api.dto.OperationFilterRequest;
 import com.example.financetracker.finance.api.dto.OperationResponse;
 import com.example.financetracker.finance.api.dto.UpdateOperationRequest;
@@ -23,12 +25,14 @@ import com.example.financetracker.finance.operation.OperationMapper;
 import com.example.financetracker.finance.operation.OperationRepository;
 import com.example.financetracker.finance.operation.OperationSpecifications;
 import com.example.financetracker.finance.security.AuthenticatedUser;
+import java.util.Map;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -110,6 +114,56 @@ public class OperationService {
     }
 
     @Transactional(readOnly = true)
+    public List<InternalOperationReportItem> getOperationsForReports(InternalOperationReportRequest request) {
+        AuthenticatedUser currentUser = getCurrentUser();
+        validateReportUserFilter(request, currentUser.userId());
+
+        Specification<Operation> accessSpecification;
+        if (request.groupId() == null) {
+            List<UUID> groupIds = familyMemberRepository.findAllByUserId(currentUser.userId())
+                    .stream()
+                    .map(FamilyMember::getGroupId)
+                    .toList();
+            accessSpecification = OperationSpecifications.accessibleTo(currentUser.userId(), groupIds);
+        } else {
+            requireGroupExists(request.groupId());
+            requireMembership(request.groupId(), currentUser.userId());
+            accessSpecification = OperationSpecifications.inGroup(request.groupId());
+        }
+
+        Specification<Operation> specification = accessSpecification
+                .and(reportFromDate(request))
+                .and(reportToDate(request))
+                .and(reportType(request))
+                .and(reportUserIds(request));
+
+        List<Operation> operations = operationRepository.findAll(
+                specification,
+                Sort.by(Sort.Direction.ASC, "operationDate").and(Sort.by("id"))
+        );
+        Map<UUID, String> categoryNames = categoryRepository.findAllById(
+                        operations.stream().map(Operation::getCategoryId).distinct().toList()
+                )
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(Category::getId, Category::getName));
+
+        return operations.stream()
+                .map(operation -> new InternalOperationReportItem(
+                        operation.getId(),
+                        operation.getUserId(),
+                        operation.getGroupId(),
+                        operation.getCategoryId(),
+                        categoryNames.getOrDefault(operation.getCategoryId(), "Unknown category"),
+                        operation.getType(),
+                        operation.getAmount(),
+                        operation.getCurrency(),
+                        operation.getOperationDate(),
+                        operation.getDescription()
+                ))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public OperationResponse getOperationById(UUID operationId) {
         Operation operation = requireOperation(operationId);
         requireCanView(operation, getCurrentUser().userId());
@@ -169,6 +223,44 @@ public class OperationService {
         if (filter.groupId() == null && filter.userId() != null && !filter.userId().equals(currentUserId)) {
             throw new InvalidOperationFilterException("Filtering by another user requires a groupId");
         }
+    }
+
+    private void validateReportUserFilter(InternalOperationReportRequest request, UUID currentUserId) {
+        if (request.groupId() == null
+                && request.userIds() != null
+                && request.userIds().stream().anyMatch(userId -> !userId.equals(currentUserId))) {
+            throw new InvalidOperationFilterException("Filtering by other users requires a groupId");
+        }
+    }
+
+    private Specification<Operation> reportFromDate(InternalOperationReportRequest request) {
+        if (request.from() == null) {
+            return Specification.where(null);
+        }
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.greaterThanOrEqualTo(root.get("operationDate"), request.from());
+    }
+
+    private Specification<Operation> reportToDate(InternalOperationReportRequest request) {
+        if (request.to() == null) {
+            return Specification.where(null);
+        }
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.lessThanOrEqualTo(root.get("operationDate"), request.to());
+    }
+
+    private Specification<Operation> reportType(InternalOperationReportRequest request) {
+        if (request.type() == null) {
+            return Specification.where(null);
+        }
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("type"), request.type());
+    }
+
+    private Specification<Operation> reportUserIds(InternalOperationReportRequest request) {
+        if (request.userIds() == null || request.userIds().isEmpty()) {
+            return Specification.where(null);
+        }
+        return (root, query, criteriaBuilder) -> root.get("userId").in(request.userIds());
     }
 
     private Operation requireOperation(UUID operationId) {
