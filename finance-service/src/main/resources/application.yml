@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: finance-service
+  datasource:
+    url: jdbc:postgresql://localhost:55433/finance_db
+    username: finance_user
+    password: finance_password
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: 8082
+
+jwt:
+  secret: change-me-change-me-change-me-change-me-1234567890
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

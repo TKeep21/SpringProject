@@ -1,0 +1,28 @@
+services:
+  auth-postgres:
+    image: postgres:16-alpine
+    container_name: finance-tracker-auth-postgres
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_password
+    ports:
+      - "55432:5432"
+    volumes:
+      - auth-postgres-data:/var/lib/postgresql/data
+
+  finance-postgres:
+    image: postgres:16-alpine
+    container_name: finance-tracker-finance-postgres
+    environment:
+      POSTGRES_DB: finance_db
+      POSTGRES_USER: finance_user
+      POSTGRES_PASSWORD: finance_password
+    ports:
+      - "55433:5432"
+    volumes:
+      - finance-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  auth-postgres-data:
+  finance-postgres-data:

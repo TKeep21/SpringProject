@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:55432/auth_db
+    username: auth_user
+    password: auth_password
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: 8081
+
+jwt:
+  secret: change-me-change-me-change-me-change-me-1234567890
+  expiration: 3600000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
