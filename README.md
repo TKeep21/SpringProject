@@ -30,8 +30,8 @@ docker compose up -d
 
 This starts:
 
-- PostgreSQL for `auth-service` on `localhost:5432`
-- PostgreSQL for `finance-service` on `localhost:5433`
+- PostgreSQL for `auth-service` on `localhost:55432`
+- PostgreSQL for `finance-service` on `localhost:55433`
 
 ## Run Services
 
@@ -60,3 +60,22 @@ mvn -pl report-service spring-boot:run
 ```bash
 docker compose down
 ```
+
+## Troubleshooting
+
+If Spring Boot fails with an error like `FATAL: role "auth_user" does not exist` or
+`FATAL: role "finance_user" does not exist`, first make sure the app is connecting to the
+container ports from this project: `55432` for `auth-service` and `55433` for `finance-service`.
+
+If the ports are correct, the PostgreSQL container was most likely initialized earlier with a
+different user and kept its old Docker volume.
+
+Recreate the databases from scratch:
+
+```bash
+docker compose down -v
+docker compose up -d
+```
+
+This removes the old PostgreSQL data volumes and lets Docker initialize the databases
+again with the users from `docker-compose.yml`.
