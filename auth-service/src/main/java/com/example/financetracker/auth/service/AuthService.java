@@ -82,6 +82,14 @@ public class AuthService {
         return toUserResponse(user);
     }
 
+    @Transactional(readOnly = true)
+    public UserResponse getUserByEmail(String email) {
+        String normalizedEmail = normalizeEmail(email);
+        User user = userRepository.findByEmail(normalizedEmail)
+                .orElseThrow(() -> new UserNotFoundException("User with email '%s' not found".formatted(normalizedEmail)));
+        return toUserResponse(user);
+    }
+
     private AuthenticatedUser getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Object principal = authentication == null ? null : authentication.getPrincipal();

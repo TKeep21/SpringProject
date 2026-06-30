@@ -6,6 +6,9 @@ COPY pom.xml .
 COPY auth-service/pom.xml auth-service/pom.xml
 COPY finance-service/pom.xml finance-service/pom.xml
 COPY report-service/pom.xml report-service/pom.xml
+
+RUN mvn -q -pl finance-service -am -DskipTests dependency:go-offline
+
 COPY finance-service/src finance-service/src
 
 RUN mvn -q -pl finance-service -am -DskipTests package

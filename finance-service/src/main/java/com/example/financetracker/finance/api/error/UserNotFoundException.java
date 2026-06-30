@@ -8,4 +8,8 @@ public class UserNotFoundException extends ApiException {
     public UserNotFoundException(UUID userId) {
         super(HttpStatus.NOT_FOUND, "User with id '%s' not found".formatted(userId));
     }
+
+    public UserNotFoundException(String email) {
+        super(HttpStatus.NOT_FOUND, "User with email '%s' not found".formatted(email));
+    }
 }

@@ -52,6 +52,38 @@ public class AuthUsersClient {
         }
     }
 
+    public AuthUserResponse getUserByEmail(String email) {
+        try {
+            AuthUserResponse user = restClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/internal/users/by-email")
+                            .queryParam("email", email)
+                            .build())
+                    .header(HttpHeaders.AUTHORIZATION, currentAuthorizationHeader())
+                    .header(InternalServiceAuthenticator.HEADER_NAME, internalServiceProperties.serviceToken())
+                    .retrieve()
+                    .body(AuthUserResponse.class);
+            if (user == null) {
+                throw new UserNotFoundException(email);
+            }
+            return user;
+        } catch (ResourceAccessException exception) {
+            throw new ExternalServiceException("Auth service is temporarily unavailable");
+        } catch (RestClientResponseException exception) {
+            if (exception.getStatusCode() == HttpStatus.NOT_FOUND) {
+                throw new UserNotFoundException(email);
+            }
+            if (exception.getStatusCode() == HttpStatus.UNAUTHORIZED
+                    || exception.getStatusCode() == HttpStatus.FORBIDDEN) {
+                throw new AccessDeniedException("Cannot verify user access in auth service");
+            }
+            if (exception.getStatusCode().is5xxServerError()) {
+                throw new ExternalServiceException("Auth service is temporarily unavailable");
+            }
+            throw exception;
+        }
+    }
+
     private String currentAuthorizationHeader() {
         if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attributes) {
             String header = attributes.getRequest().getHeader(HttpHeaders.AUTHORIZATION);

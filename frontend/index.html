@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Учет финансов</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">FT</div>
+        <div>
+          <h1>Учет финансов</h1>
+          <p>Личные и семейные расходы</p>
+        </div>
+      </div>
+
+      <nav class="nav-tabs" aria-label="Основные разделы">
+        <button class="nav-tab is-active" type="button" data-tab="overview">Обзор</button>
+        <button class="nav-tab" type="button" data-tab="groups">Группы</button>
+        <button class="nav-tab" type="button" data-tab="categories">Категории</button>
+        <button class="nav-tab" type="button" data-tab="operations">Операции</button>
+        <button class="nav-tab" type="button" data-tab="reports">Отчеты</button>
+      </nav>
+
+      <section class="session-card">
+        <div class="section-kicker">Сессия</div>
+        <div id="sessionUser" class="session-user">Не авторизован</div>
+        <div id="sessionToken" class="token-preview">Нет токена</div>
+        <button id="logoutButton" class="ghost-button" type="button">Выйти</button>
+      </section>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <div class="section-kicker">Демо-панель</div>
+          <h2 id="pageTitle">Обзор</h2>
+        </div>
+        <div class="topbar-actions">
+          <button id="refreshButton" class="secondary-button" type="button">Обновить данные</button>
+          <a class="swagger-link" href="http://localhost:8082/swagger-ui/index.html" target="_blank" rel="noreferrer">Swagger</a>
+        </div>
+      </header>
+
+      <section id="toast" class="toast" hidden></section>
+
+      <section id="overview" class="tab-panel is-active">
+        <div class="dashboard-grid">
+          <section class="panel auth-panel">
+            <div class="panel-header">
+              <div>
+                <div class="section-kicker">Начать здесь</div>
+                <h3>Вход</h3>
+              </div>
+              <div class="mode-switch" role="tablist" aria-label="Режим авторизации">
+                <button id="loginModeButton" class="is-active" type="button">Вход</button>
+                <button id="registerModeButton" type="button">Регистрация</button>
+              </div>
+            </div>
+
+            <form id="authForm" class="form-grid">
+              <label>Email
+                <input name="email" type="email" value="demo@example.com" autocomplete="email" required>
+              </label>
+              <label>Пароль
+                <input name="password" type="password" value="password123" autocomplete="current-password" required>
+              </label>
+              <label class="register-field">Имя
+                <input name="firstName" value="Демо" autocomplete="given-name">
+              </label>
+              <label class="register-field">Фамилия
+                <input name="lastName" value="Пользователь" autocomplete="family-name">
+              </label>
+              <button id="authSubmitButton" class="primary-button form-action" type="submit">Войти</button>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="section-kicker">Текущий срез</div>
+                <h3>Итоги за месяц</h3>
+              </div>
+              <button id="loadOverviewButton" class="secondary-button" type="button">Загрузить итоги</button>
+            </div>
+            <div class="metric-grid">
+              <div class="metric-card income">
+                <span>Доходы</span>
+                <strong id="overviewIncome">0.00</strong>
+              </div>
+              <div class="metric-card expense">
+                <span>Расходы</span>
+                <strong id="overviewExpense">0.00</strong>
+              </div>
+              <div class="metric-card balance">
+                <span>Баланс</span>
+                <strong id="overviewBalance">0.00</strong>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+      <section id="groups" class="tab-panel">
+        <div class="two-column">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="section-kicker">Семейный бюджет</div>
+                <h3>Создать группу</h3>
+              </div>
+            </div>
+            <form id="groupForm" class="form-grid">
+              <label>Название
+                <input name="name" value="Семейный бюджет" required>
+              </label>
+              <label>Описание
+                <input name="description" value="Общие семейные финансы">
+              </label>
+              <button class="primary-button form-action" type="submit">Создать группу</button>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="section-kicker">Участники</div>
+                <h3>Добавить участника</h3>
+              </div>
+            </div>
+            <form id="memberForm" class="form-grid">
+              <label>Группа
+                <select name="groupId" id="memberGroupSelect" required></select>
+              </label>
+              <label>Email пользователя
+                <input name="email" type="email" placeholder="user@example.com" autocomplete="email" required>
+              </label>
+              <label>Роль
+                <select name="role">
+                  <option value="MEMBER">Участник</option>
+                  <option value="ADMIN">Администратор</option>
+                </select>
+              </label>
+              <button class="primary-button form-action" type="submit">Добавить участника</button>
+            </form>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="section-kicker">Группы</div>
+              <h3>Доступны текущему пользователю</h3>
+            </div>
+            <button id="reloadGroupsButton" class="secondary-button" type="button">Обновить</button>
+          </div>
+          <div id="groupsList" class="list-grid empty-state">Группы не загружены</div>
+        </section>
+      </section>
+
+      <section id="categories" class="tab-panel">
+        <div class="two-column">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="section-kicker">Классификация</div>
+                <h3>Создать категорию</h3>
+              </div>
+            </div>
+            <form id="categoryForm" class="form-grid">
+              <label>Название
+                <input name="name" value="Продукты" required>
+              </label>
+              <label>Тип
+                <select name="type">
+                  <option value="EXPENSE">Расход</option>
+                  <option value="INCOME">Доход</option>
+                </select>
+              </label>
+              <label>Область
+                <select name="groupId" id="categoryGroupSelect">
+                  <option value="">Личная</option>
+                </select>
+              </label>
+              <button class="primary-button form-action" type="submit">Создать категорию</button>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="section-kicker">Выбор категории</div>
+                <h3>Фильтр списка</h3>
+              </div>
+            </div>
+            <form id="categoryFilterForm" class="form-grid compact-form">
+              <label>Тип
+                <select name="type">
+                  <option value="">Все</option>
+                  <option value="EXPENSE">Расход</option>
+                  <option value="INCOME">Доход</option>
+                </select>
+              </label>
+              <label>Область
+                <select name="groupId" id="categoryFilterGroupSelect">
+                  <option value="">Личные/стандартные</option>
+                </select>
+              </label>
+              <button class="secondary-button form-action" type="submit">Загрузить категории</button>
+            </form>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="section-kicker">Категории</div>
+              <h3>Стандартные, личные и групповые категории</h3>
+            </div>
+          </div>
+          <div id="categoriesList" class="list-grid empty-state">Категории не загружены</div>
+        </section>
+      </section>
+
+      <section id="operations" class="tab-panel">
+        <div class="two-column">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="section-kicker">Операция</div>
+                <h3>Добавить операцию</h3>
+              </div>
+            </div>
+            <form id="operationForm" class="form-grid">
+              <label>Область
+                <select name="groupId" id="operationGroupSelect">
+                  <option value="">Личная</option>
+                </select>
+              </label>
+              <label>Тип
+                <select name="type" id="operationTypeSelect">
+                  <option value="EXPENSE">Расход</option>
+                  <option value="INCOME">Доход</option>
+                </select>
+              </label>
+              <label>Категория
+                <select name="categoryId" id="operationCategorySelect" required></select>
+              </label>
+              <label>Сумма
+                <input name="amount" type="number" min="0.01" step="0.01" value="100.00" required>
+              </label>
+              <label>Валюта
+                <input name="currency" value="USD" maxlength="3" required>
+              </label>
+              <label>Дата
+                <input name="operationDate" type="date" required>
+              </label>
+              <label class="full-field">Описание
+                <input name="description" value="Демо-операция">
+              </label>
+              <button class="primary-button form-action" type="submit">Добавить операцию</button>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="section-kicker">Фильтры</div>
+                <h3>Список операций</h3>
+              </div>
+            </div>
+            <form id="operationFilterForm" class="form-grid compact-form">
+              <label>С
+                <input name="fromDate" type="date">
+              </label>
+              <label>По
+                <input name="toDate" type="date">
+              </label>
+              <label>Тип
+                <select name="type">
+                  <option value="">Все</option>
+                  <option value="EXPENSE">Расход</option>
+                  <option value="INCOME">Доход</option>
+                </select>
+              </label>
+              <label>Группа
+                <select name="groupId" id="operationFilterGroupSelect">
+                  <option value="">Все доступные</option>
+                </select>
+              </label>
+              <button class="secondary-button form-action" type="submit">Загрузить операции</button>
+            </form>
+          </section>
+        </div>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="section-kicker">Журнал</div>
+              <h3>Последние операции</h3>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th>Тип</th>
+                  <th>Сумма</th>
+                  <th>Область</th>
+                  <th>Категория</th>
+                  <th>Описание</th>
+                </tr>
+              </thead>
+              <tbody id="operationsTable">
+                <tr><td colspan="6" class="empty-table">Операции не загружены</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <section id="reports" class="tab-panel">
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="section-kicker">Аналитика</div>
+              <h3>Фильтры отчета</h3>
+            </div>
+          </div>
+          <form id="reportForm" class="report-grid">
+            <label>С
+              <input name="from" type="date" required>
+            </label>
+            <label>По
+              <input name="to" type="date" required>
+            </label>
+            <label>Группа
+              <select name="groupId" id="reportGroupSelect">
+                <option value="">Личные + доступные группы</option>
+              </select>
+            </label>
+            <label>Тип
+              <select name="type">
+                <option value="">Все</option>
+                <option value="EXPENSE">Расход</option>
+                <option value="INCOME">Доход</option>
+              </select>
+            </label>
+            <label>Валюта
+              <input name="currency" value="USD" maxlength="3">
+            </label>
+            <div class="report-actions">
+              <button id="summaryReportButton" class="primary-button" type="button">Итоги</button>
+              <button id="categoryReportButton" class="secondary-button" type="button">По категориям</button>
+              <button id="memberReportButton" class="secondary-button" type="button">По участникам</button>
+              <button id="exportCsvButton" class="secondary-button" type="button">Выгрузить CSV</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <div class="section-kicker">Результат</div>
+              <h3>Вывод отчета</h3>
+            </div>
+          </div>
+          <div id="reportOutput" class="report-output empty-state">Запустите отчет, чтобы увидеть аналитику</div>
+        </section>
+      </section>
+
+      <section class="panel response-panel">
+        <div class="panel-header">
+          <div>
+            <div class="section-kicker">Последний ответ API</div>
+            <h3>Технические детали</h3>
+          </div>
+          <button id="clearResponseButton" class="ghost-button" type="button">Очистить</button>
+        </div>
+        <pre id="responseLog">Запросов пока не было</pre>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
