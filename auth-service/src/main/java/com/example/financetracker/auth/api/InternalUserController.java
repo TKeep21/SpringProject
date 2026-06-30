@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Hidden
@@ -31,5 +32,14 @@ public class InternalUserController {
     ) {
         internalServiceAuthenticator.requireValidToken(internalToken);
         return authService.getUserById(id);
+    }
+
+    @GetMapping("/by-email")
+    public UserResponse getByEmail(
+            @RequestParam String email,
+            @RequestHeader(value = InternalServiceAuthenticator.HEADER_NAME, required = false) String internalToken
+    ) {
+        internalServiceAuthenticator.requireValidToken(internalToken);
+        return authService.getUserByEmail(email);
     }
 }

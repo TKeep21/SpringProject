@@ -3,6 +3,7 @@ package com.example.financetracker.finance;
 import com.example.financetracker.finance.category.Category;
 import com.example.financetracker.finance.category.CategoryRepository;
 import com.example.financetracker.finance.category.OperationType;
+import com.example.financetracker.finance.client.AuthUserResponse;
 import com.example.financetracker.finance.client.AuthUsersClient;
 import com.example.financetracker.finance.group.FamilyGroup;
 import com.example.financetracker.finance.group.FamilyGroupRepository;
@@ -108,10 +109,10 @@ class FinanceControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "userId": "%s",
+                                  "email": "member@example.com",
                                   "role": "MEMBER"
                                 }
-                                """.formatted(MEMBER_ID)))
+                                """))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.userId").value(MEMBER_ID.toString()))
                 .andExpect(jsonPath("$.role").value("MEMBER"));
@@ -121,10 +122,10 @@ class FinanceControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "userId": "%s",
+                                  "email": "outsider@example.com",
                                   "role": "MEMBER"
                                 }
-                                """.formatted(OUTSIDER_ID)))
+                                """))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("Only owner or admin can manage group members"));
     }
@@ -271,10 +272,10 @@ class FinanceControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "userId": "%s",
+                                  "email": "outsider@example.com",
                                   "role": "MEMBER"
                                 }
-                                """.formatted(OUTSIDER_ID)))
+                                """))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("Only owner or admin can manage group members"));
 
@@ -454,6 +455,16 @@ class FinanceControllerIntegrationTest {
                 @Override
                 public void requireUserExists(UUID userId) {
                     // Tests exercise finance-service behavior without calling auth-service.
+                }
+
+                @Override
+                public AuthUserResponse getUserByEmail(String email) {
+                    return switch (email) {
+                        case "owner@example.com" -> new AuthUserResponse(OWNER_ID, email);
+                        case "member@example.com" -> new AuthUserResponse(MEMBER_ID, email);
+                        case "outsider@example.com" -> new AuthUserResponse(OUTSIDER_ID, email);
+                        default -> new AuthUserResponse(UUID.fromString("00000000-0000-0000-0000-000000000099"), email);
+                    };
                 }
             };
         }

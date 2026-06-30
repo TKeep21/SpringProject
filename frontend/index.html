@@ -102,21 +102,6 @@
             </div>
           </section>
 
-          <section class="panel wide-panel">
-            <div class="panel-header">
-              <div>
-                <div class="section-kicker">Сценарий показа</div>
-                <h3>Рекомендуемый путь</h3>
-              </div>
-            </div>
-            <div class="flow-list">
-              <div><span>1</span> Зарегистрироваться или войти и получить JWT</div>
-              <div><span>2</span> Создать группу или вести личный учет</div>
-              <div><span>3</span> Выбрать стандартную категорию или создать свою</div>
-              <div><span>4</span> Добавить доходы и расходы</div>
-              <div><span>5</span> Открыть отчеты и выгрузить CSV</div>
-            </div>
-          </section>
         </div>
       </section>
 
@@ -151,8 +136,8 @@
               <label>Группа
                 <select name="groupId" id="memberGroupSelect" required></select>
               </label>
-              <label>ID пользователя
-                <input name="userId" placeholder="UUID зарегистрированного пользователя" required>
+              <label>Email пользователя
+                <input name="email" type="email" placeholder="user@example.com" autocomplete="email" required>
               </label>
               <label>Роль
                 <select name="role">

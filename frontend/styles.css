@@ -377,33 +377,6 @@ label {
   color: var(--accent-dark);
 }
 
-.flow-list {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.flow-list div {
-  display: grid;
-  gap: 10px;
-  min-height: 104px;
-  padding: 14px;
-  background: var(--surface-soft);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  font-weight: 700;
-}
-
-.flow-list span {
-  display: grid;
-  width: 28px;
-  height: 28px;
-  place-items: center;
-  color: #fff;
-  background: var(--accent);
-  border-radius: 50%;
-}
-
 .list-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -579,8 +552,7 @@ pre {
 
   .dashboard-grid,
   .two-column,
-  .report-grid,
-  .flow-list {
+  .report-grid {
     grid-template-columns: 1fr;
   }
 }

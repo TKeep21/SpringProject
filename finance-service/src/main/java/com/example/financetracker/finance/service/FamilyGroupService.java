@@ -13,6 +13,7 @@ import com.example.financetracker.finance.api.error.GroupNotFoundException;
 import com.example.financetracker.finance.api.error.InvalidGroupMemberRoleException;
 import com.example.financetracker.finance.api.error.MemberAlreadyExistsException;
 import com.example.financetracker.finance.api.error.MemberNotFoundException;
+import com.example.financetracker.finance.client.AuthUserResponse;
 import com.example.financetracker.finance.client.AuthUsersClient;
 import com.example.financetracker.finance.group.FamilyGroup;
 import com.example.financetracker.finance.group.FamilyGroupRepository;
@@ -126,14 +127,14 @@ public class FamilyGroupService {
         if (request.role() == FamilyRole.OWNER) {
             throw new InvalidGroupMemberRoleException();
         }
-        authUsersClient.requireUserExists(request.userId());
-        if (familyMemberRepository.existsByGroupIdAndUserId(groupId, request.userId())) {
-            throw new MemberAlreadyExistsException(groupId, request.userId());
+        AuthUserResponse user = authUsersClient.getUserByEmail(request.email());
+        if (familyMemberRepository.existsByGroupIdAndUserId(groupId, user.id())) {
+            throw new MemberAlreadyExistsException(groupId, user.id());
         }
 
         FamilyMember member = new FamilyMember();
         member.setGroupId(groupId);
-        member.setUserId(request.userId());
+        member.setUserId(user.id());
         member.setRole(request.role());
         FamilyMember savedMember = familyMemberRepository.save(member);
         return toMemberResponse(savedMember);
